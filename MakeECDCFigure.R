@@ -1,18 +1,17 @@
 #Plot the European CSC data
-setwd("~/Documents/Selection-Selection-Balance-Model")
+setwd("~/Documents/GitHub/CoexistencePaper")
 library(ggplot2)
 library(ggrepel)
 library(Polychrome)
 library(here)
 library(tidyverse)
 
-ECDCData <- read.csv("DataSurveillanceAtlasOfInfectiousDiseasesECDC/ECDC_surveillance_data_Antimicrobial_resistance.csv", 
+ECDCData <- read.csv("ECDC_surveillance_data_Antimicrobial_resistance.csv", 
                      stringsAsFactors = FALSE)
 ECDCData <- ECDCData[ECDCData$Indicator == "R - resistant isolates, percentage  ",]
 ECDCData$NumValue <- as.numeric(as.character(ECDCData$NumValue))
 summary(ECDCData)
 ECDCData$RegionName<-as.factor(ECDCData$RegionName)
-
 
 ggplot(data = ECDCData, mapping = aes(x = Time, y = NumValue))+
   geom_line(aes(color = RegionName))+
@@ -54,7 +53,7 @@ MediumCountries <- c("Germany",
                   "Ireland"
                   )
 
-QuinUseTable<-read.csv("DataSurveillanceAtlasOfInfectiousDiseasesECDC/Downloadable_Tables_2015/2015_data_Table_D6_J01M_quinolone antibacterials_trend_community_sparklines.csv")
+QuinUseTable<-read.csv("2015_data_Table_D6_J01M_quinolone antibacterials_trend_community_sparklines.csv")
 QuinoloneUse<-c()
 for (co in MediumCountries){
   if(length(which(QuinUseTable$Country==co))==1){
@@ -71,7 +70,6 @@ for (c in 1:length(MediumCountries)){
 
 QuinUseDF <- data.frame(MediumCountries, QuinoloneUse, Resistance2015)
 QuinUseDF <- QuinUseDF[!is.na(QuinUseDF$QuinoloneUse),]
-
 
 #Make colors (thanks to Olivia Pham)
 color_hex <- c('#e6194b', '#3cb44b', '#00ff00', '#4363d8', 
@@ -91,7 +89,7 @@ ordered_color <- country_colors %>% pull(color_hex)
 names(ordered_color) <- country_colors %>% pull(RegionName) 
 ordered_color
 
-png(filename = "FiguresSimulations_ECDCData/ECDCPlot_v2.png", width = 7, height = 3.8, units = "in", res = 300)
+png(filename = "Figure1A_ECDCPlot_ResistanceOverTime.png", width = 7, height = 3.8, units = "in", res = 300)
 ggplot(data = ECDCDataBigCountries, mapping = aes(x = Time, y = NumValue, color = RegionName))+
   geom_line(aes(color = RegionName))+
   scale_color_manual(values = ordered_color)+
@@ -112,7 +110,7 @@ dev.off()
 
 Rsqvalue = as.character(round(cor.test(QuinoloneUse, Resistance2015)$estimate,2))
 
-png(filename = "FiguresSimulations_ECDCData/ECDCPlot_Correlation_Nov7_v2.png", width = 5, height = 6, units = "in", res = 300)
+png(filename = "Figure1B_ECDCPlot_Correlation.png", width = 5, height = 6, units = "in", res = 300)
 
 ggplot(data = QuinUseDF, mapping = aes(x = QuinoloneUse, y = Resistance2015, color = MediumCountries, label=MediumCountries))+
   geom_point(aes(color = MediumCountries), size = 3, show.legend = FALSE)+
