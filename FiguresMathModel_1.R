@@ -1,9 +1,9 @@
 
-#Make a plot for the relationship between e, c and f
+#Make a plot for the relationship between t, e, c and f
 library("RColorBrewer")
 library("ggplot2")
 library("tidyverse")
-setwd("~/Documents/Selection-Selection-Balance-Model")
+setwd("~/Documents/GitHub/CoexistencePaper")
 
 
 tevalues <- seq(0.0,0.05, by = 0.005)
@@ -22,7 +22,7 @@ DF<-DF %>% group_by(c_value_factor)
 set.seed(30)
 mycolorsMathFigures <- sample(colorRampPalette(brewer.pal(8, "Set3"))(30))
 
-png(filename = "FiguresSimulations_ECDCData/EvolutionVsFraction_V2.png", width = 5, height = 4, units = "in", res = 300)
+png(filename = "Figure2_EvolutionVsFractionResistant.png", width = 5, height = 4, units = "in", res = 300)
 
 ggplot(data = DF, aes(x = te_value, y = f_value, group = c_value_factor, color = c_value_factor))+
   geom_line(linewidth = 1)+
