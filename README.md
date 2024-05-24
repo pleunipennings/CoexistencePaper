@@ -44,24 +44,40 @@ FiguresMathModel_1.R
 ##################
 
 Figure 3A: 
-
+Figure_3A_Resistance_Trends_Gladstone.png
 
 
 Figure 3B: 
-
+Figure_3B_Norway_NumClusters.png
 
 
 Figure 3C: 
-
+Figure_3C_Norway_LongevityClusters.png
 
 
 Figure 3D: 
 
 
 Data needed: 
+For 3B and C
+NorwayGladstoneData/SummaryDataClusters4Drugs/CLusterSizeDF_Piperacillin_tazobactam_SIR.csv
+NorwayGladstoneData/SummaryDataClusters4Drugs/CLusterSizeDF_Cefotaxim_SIR.csv
+NorwayGladstoneData/SummaryDataClusters4Drugs/CLusterSizeDF_Gentamicin_SIR.csv
+NorwayGladstoneData/SummaryDataClusters4Drugs/CLusterSizeDF_Ampicillin_SIR.csv
+NorwayGladstoneData/SummaryDataClusters4Drugs/CLusterSizeDF_Ciprofloxacin_SIR.csv
+
+For 3A
+MetaData Norway: NorwayGladstoneData/data.csv
+ECDC_surveillance_data_Antimicrobial_resistance_complete_DownloadApril2024.csv
+
 
 Code: 
+Norway_Clusters_Tree_4Drugs.R determines singe and longevity of resistance clusters
+##This needs as input the metadata and the tree file. 
 
+Figure3ABC_NorwaySimpleNumClustersPlots.R
+
+##Still needed: code for 3D. 
 
 
 
