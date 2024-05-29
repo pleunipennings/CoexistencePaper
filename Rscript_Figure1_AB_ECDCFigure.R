@@ -6,14 +6,25 @@ library(Polychrome)
 library(here)
 library(tidyverse)
 
-ECDCData <- read.csv("ECDC_surveillance_data_Antimicrobial_resistance.csv", 
-                     stringsAsFactors = FALSE)
-ECDCData <- ECDCData[ECDCData$Indicator == "R - resistant isolates, percentage  ",]
-ECDCData$NumValue <- as.numeric(as.character(ECDCData$NumValue))
-summary(ECDCData)
-ECDCData$RegionName<-as.factor(ECDCData$RegionName)
+#Read the data (downloaded from ECDC database https://atlas.ecdc.europa.eu/public/index.aspx)
+ECDCResistance <- read.csv("ECDCResistance/ECDC_surveillance_data_Antimicrobial_resistance_complete_DownloadApril2024.csv", 
+                                   stringsAsFactors = FALSE)
+#Keep only Resistance percentage info (not other indicators)
+ECDCResistance <- ECDCResistance[ECDCResistance$Indicator == "R - resistant isolates, percentage  ",] ##only keep the % resistance indicator
+#Make sure the value is read as a number (this is the % resistant) ignore warning (not related to E coli data)
+ECDCResistance$NumValue <- as.numeric(as.character(ECDCResistance$NumValue)) 
+#Make country name as factor
+ECDCResistance$RegionName<-as.factor(ECDCResistance$RegionName)
+##Make a column for the bacterium and a column for the drug. 
+#The Population column has info on the bacterium and the drug, separated by a "|"
+ECDCResistance$Bacterium<-str_split_i(ECDCResistance$Population,pattern ='\\|',1)
+ECDCResistance$Drug<-str_split_i(ECDCResistance$Population,pattern ='\\|',2)
+#Keep only E. coli
+ECDCResistance <- ECDCResistance[ECDCResistance$Bacterium == "Escherichia coli",]
+#Keep only "Fluoroquinolones"
+ECDCResistance<- ECDCResistance[ECDCResistance$Drug %in% "Fluoroquinolones",]
 
-ggplot(data = ECDCData, mapping = aes(x = Time, y = NumValue))+
+ggplot(data = ECDCResistance, mapping = aes(x = Time, y = NumValue))+
   geom_line(aes(color = RegionName))+
   theme(legend.position = "bottom")+
   scale_y_continuous(limits = c(0,100))
@@ -29,7 +40,7 @@ BigCountries <- c("Germany",
 "Belgium" ,
 "Czechia")
 
-ECDCDataBigCountries <- ECDCData[ECDCData$RegionName %in% BigCountries,]
+ECDCResistanceBigCountries <- ECDCResistance[ECDCResistance$RegionName %in% BigCountries,]
 
 MediumCountries <- c("Germany", 
                   "United Kingdom",
@@ -53,7 +64,7 @@ MediumCountries <- c("Germany",
                   "Ireland"
                   )
 
-QuinUseTable<-read.csv("2015_data_Table_D6_J01M_quinolone antibacterials_trend_community_sparklines.csv")
+QuinUseTable<-read.csv("ECDCData/2015_data_Table_D6_J01M_quinolone antibacterials_trend_community_sparklines.csv")
 QuinoloneUse<-c()
 for (co in MediumCountries){
   if(length(which(QuinUseTable$Country==co))==1){
@@ -64,8 +75,8 @@ for (co in MediumCountries){
 Resistance2015 <- c()
 for (c in 1:length(MediumCountries)){
   print(MediumCountries[c])
-  Resistance2015 <-  c(Resistance2015, ECDCData$NumValue
-                       [ECDCData$Time==2015 & ECDCData$RegionName == MediumCountries[c]])
+  Resistance2015 <-  c(Resistance2015, ECDCResistance$NumValue
+                       [ECDCResistance$Time==2015 & ECDCResistance$RegionName == MediumCountries[c]])
 }
 
 QuinUseDF <- data.frame(MediumCountries, QuinoloneUse, Resistance2015)
@@ -89,8 +100,8 @@ ordered_color <- country_colors %>% pull(color_hex)
 names(ordered_color) <- country_colors %>% pull(RegionName) 
 ordered_color
 
-png(filename = "Figure1A_ECDCPlot_ResistanceOverTime.png", width = 7, height = 3.8, units = "in", res = 300)
-ggplot(data = ECDCDataBigCountries, mapping = aes(x = Time, y = NumValue, color = RegionName))+
+png(filename = "Figures/Figure1A_ECDCPlot_ResistanceOverTime.png", width = 7, height = 3.8, units = "in", res = 300)
+ggplot(data = ECDCResistanceBigCountries, mapping = aes(x = Time, y = NumValue, color = RegionName))+
   geom_line(aes(color = RegionName))+
   scale_color_manual(values = ordered_color)+
   scale_y_continuous(limits = c(0,100))+
@@ -110,7 +121,7 @@ dev.off()
 
 Rsqvalue = as.character(round(cor.test(QuinoloneUse, Resistance2015)$estimate,2))
 
-png(filename = "Figure1B_ECDCPlot_Correlation.png", width = 5, height = 6, units = "in", res = 300)
+png(filename = "Figures/Figure1B_ECDCPlot_Correlation.png", width = 5, height = 6, units = "in", res = 300)
 
 ggplot(data = QuinUseDF, mapping = aes(x = QuinoloneUse, y = Resistance2015, color = MediumCountries, label=MediumCountries))+
   geom_point(aes(color = MediumCountries), size = 3, show.legend = FALSE)+
@@ -140,3 +151,4 @@ dev.off()
 
 cor.test(QuinoloneUse, Resistance2015)
 summary(lm(Resistance2015 ~ QuinoloneUse))
+

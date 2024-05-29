@@ -22,7 +22,7 @@ DF<-DF %>% group_by(c_value_factor)
 set.seed(30)
 mycolorsMathFigures <- sample(colorRampPalette(brewer.pal(8, "Set3"))(30))
 
-png(filename = "Figure2_EvolutionVsFractionResistant.png", width = 5, height = 4, units = "in", res = 300)
+png(filename = "Figures/Figure2_EvolutionVsFractionResistant.png", width = 5, height = 4, units = "in", res = 300)
 
 ggplot(data = DF, aes(x = te_value, y = f_value, group = c_value_factor, color = c_value_factor))+
   geom_line(linewidth = 1)+

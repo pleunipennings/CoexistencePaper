@@ -44,13 +44,6 @@ OverviewAll  <- ClusterSizeDF %>%
   group_by(CLusterSurvivalTime, DrugResistance) %>%
   summarize(SumClusters = sum(clustersize), NClusters = n(), .groups = 'drop')
 OverviewAll <- as.data.frame(OverviewAll)
-OverviewAll$CLusterSurvivalTime123<-OverviewAll$CLusterSurvivalTime
-OverviewAll$CLusterSurvivalTime123[OverviewAll$CLusterSurvivalTime123>8]<-">8 years"
-OverviewAll$CLusterSurvivalTime123[OverviewAll$CLusterSurvivalTime123>3]<-"4-8 years"
-OverviewAll$CLusterSurvivalTime123[OverviewAll$CLusterSurvivalTime123==3]<-"3 years"
-OverviewAll$CLusterSurvivalTime123[OverviewAll$CLusterSurvivalTime123==2]<-"2 years"
-OverviewAll$CLusterSurvivalTime123[OverviewAll$CLusterSurvivalTime123==1]<-"1 year"
-OverviewAll$CLusterSurvivalTime123<-factor(OverviewAll$CLusterSurvivalTime123, levels = c(">8 years","4-8 years", "3 years", "2 years", "1 year"))
 OverviewAll$CLusterSurvivalTime<-factor(OverviewAll$CLusterSurvivalTime, levels = 16:1)
 
 ###########################
@@ -59,7 +52,7 @@ OverviewAll$CLusterSurvivalTime<-factor(OverviewAll$CLusterSurvivalTime, levels 
 #####
 ###########################
 
-png(paste0("Figure_3C_Norway_LongevityClusters.png"), width = 5.5, height = 5.5, units = "in", res = 200)
+png(paste0("Figures/Figure_3C_Norway_LongevityClusters.png"), width = 5.5, height = 5.5, units = "in", res = 200)
 
 ggplot(data = OverviewAll, aes(x = DrugResistance, y = NClusters, fill = CLusterSurvivalTime)) +
   geom_bar(position = "fill",stat = "identity", color = "black")+
@@ -68,7 +61,7 @@ ggplot(data = OverviewAll, aes(x = DrugResistance, y = NClusters, fill = CLuster
   #scale_fill_brewer(palette = "Set1")+
   theme_bw()+
   scale_fill_discrete(name = "Longevity", labels = paste0(c(16,14:1), " y"))+
-  ggtitle("Longevity of resistance clusters")+
+  ggtitle("Longevity of resistance strains")+
   theme(legend.position="right")
 dev.off()
 
@@ -87,7 +80,7 @@ color_hex <- c( "#00b0f6", "#00bf7d", "#ff67a4", "#a3a500", "#e58700")
 names(color_hex) = OverviewTotalClusters$DrugResistance
 OverviewTotalClusters$DrugResistance<-as.factor(OverviewTotalClusters$DrugResistance)
 
-png(paste0("Figure_3B_Norway_NumClusters.png"), width = 5.5, height = 5.5, units = "in", res = 200)
+png(paste0("Figures/Figure_3B_Norway_NumClusters.png"), width = 5.5, height = 5.5, units = "in", res = 200)
 ggplot(data = OverviewTotalClusters, aes(x = DrugResistance, y = NClusters,fill = DrugResistance))+
   geom_bar(stat="identity", show.legend = FALSE, color = "black")+
   ylab("Number of origins of resistance")+
@@ -124,7 +117,7 @@ for (i in 1:nrow(NorwaySummary)){  #Go through each year and get the % resistant
 }
 
 #Read the data (downloaded from ECDC database https://atlas.ecdc.europa.eu/public/index.aspx)
-ECDCResistanceAllDrugs <- read.csv("ECDC_surveillance_data_Antimicrobial_resistance_complete_DownloadApril2024.csv", 
+ECDCResistanceAllDrugs <- read.csv("ECDCData/ECDC_surveillance_data_Antimicrobial_resistance_complete_DownloadApril2024.csv", 
                                    stringsAsFactors = FALSE)
 #Keep only Resistance percentage info (not other indicators)
 ECDCResistanceAllDrugs <- ECDCResistanceAllDrugs[ECDCResistanceAllDrugs$Indicator == "R - resistant isolates, percentage  ",] ##only keep the % resistance indicator
@@ -152,7 +145,7 @@ ECDCResistanceAllDrugs<- ECDCResistanceAllDrugs[ECDCResistanceAllDrugs$RegionNam
 ##############################################
 
 ##Aminoglycosides (including Gentamicin)
-png("Figure_3A_Resistance_Trends_Gladstone.png", width = 5.5, height = 5.5, units = "in", res = 300)
+png("Figures/Figure_3A_Resistance_Trends_Gladstone.png", width = 5.5, height = 5.5, units = "in", res = 300)
 ggplot(data = NorwaySummary, 
        mapping = aes(x = year, y = Gentamicin_RES))+
   #geom_line()+
@@ -172,14 +165,14 @@ ggplot(data = NorwaySummary,
 
   geom_line(data = NorwaySummary, aes(x = as.numeric(as.character(year)), y = Ciprofloxacin_RES*100), col = color_hex[3])+
   geom_line(data = ECDCResistanceAllDrugs[ECDCResistanceAllDrugs$Drug == "Fluoroquinolones",],aes(x = Time, y = NumValue), col = color_hex[3], linetype = "dashed")+ 
-  geom_text(x = 2022, y = 13, label = "Ciprofloxacin", col = color_hex[3])+
+  geom_text(x = 2021.5, y = 13, label = "Ciprofloxacin", col = color_hex[3])+
 
   geom_line(data = NorwaySummary, aes(x = as.numeric(as.character(year)), y = Gentamicin_RES*100),col = color_hex[4])+
   geom_line(data = ECDCResistanceAllDrugs[ECDCResistanceAllDrugs$Drug == "Aminoglycosides",],aes(x = Time, y = NumValue), linetype = "dashed",col = color_hex[4])+ 
   geom_text(x = 2022, y = 3.5, label = "Gentamicin", col = color_hex[4])+
   
   geom_line(data = NorwaySummary, aes(x = as.numeric(as.character(year)), y = PipTaz_RES*100), col = color_hex[5])+
-  geom_text(x = 2017.7, y = 2, label = "PipTaz", col = color_hex[5])
+  geom_text(x = 2018.4, y = 2, label = "PipTaz", col = color_hex[5])
 dev.off()
 
 
