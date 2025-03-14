@@ -7,7 +7,7 @@ library(here)
 library(tidyverse)
 
 #Read the data (downloaded from ECDC database https://atlas.ecdc.europa.eu/public/index.aspx)
-ECDCResistance <- read.csv("ECDCResistance/ECDC_surveillance_data_Antimicrobial_resistance_complete_DownloadApril2024.csv", 
+ECDCResistance <- read.csv("ECDCData/ECDC_surveillance_data_Antimicrobial_resistance_complete_DownloadApril2024.csv", 
                                    stringsAsFactors = FALSE)
 #Keep only Resistance percentage info (not other indicators)
 ECDCResistance <- ECDCResistance[ECDCResistance$Indicator == "R - resistant isolates, percentage  ",] ##only keep the % resistance indicator
@@ -119,14 +119,14 @@ ggplot(data = ECDCResistanceBigCountries, mapping = aes(x = Time, y = NumValue, 
        color = "Region Name")
 dev.off()
 
-Rsqvalue = as.character(round(cor.test(QuinoloneUse, Resistance2015)$estimate,2))
+Rsqvalue = as.character(round(cor.test(QuinoloneUse, Resistance2015)$estimate,2)^2)
 
-png(filename = "Figures/Figure1B_ECDCPlot_Correlation.png", width = 5, height = 6, units = "in", res = 300)
-
-ggplot(data = QuinUseDF, mapping = aes(x = QuinoloneUse, y = Resistance2015, color = MediumCountries, label=MediumCountries))+
+png(filename = "Figures/Figure1B_ECDCPlot_CorrelationThrough0.png", width = 5, height = 6, units = "in", res = 300)
+  
+p = ggplot(data = QuinUseDF, mapping = aes(x = QuinoloneUse, y = Resistance2015, color = MediumCountries, label=MediumCountries))+
   geom_point(aes(color = MediumCountries), size = 3, show.legend = FALSE)+
   scale_color_manual(values = ordered_color)+
-  scale_y_continuous(limits = c(7,50))+
+  scale_y_continuous(limits = c(0,50))+
   scale_x_continuous(limits = c(0,4.5))+
   theme_bw()+
   theme(legend.position = "none",
@@ -141,14 +141,31 @@ ggplot(data = QuinUseDF, mapping = aes(x = QuinoloneUse, y = Resistance2015, col
         axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0)))+
   guides(color = guide_legend(title = "Country"))+
   labs(y= "Percentage resistant isolates 2015", x = "Quinolone Use DDD / 1000")+
-  
   annotate(geom="text", x=1, y=40, label=paste("R^2 =", Rsqvalue), size = 5)+
-  geom_text_repel(nudge_x = .3)+
-  geom_abline(slope = lm(Resistance2015 ~ QuinoloneUse)$coefficients[2], intercept = lm(Resistance2015 ~ QuinoloneUse)$coefficients[1], 
-              color = "grey", linewidth = 2, alpha = 0.5) 
+  geom_text_repel(nudge_x = .3)
 
+p+  geom_abline(slope = lm(Resistance2015 ~ 0 + QuinoloneUse)$coefficients[1], intercept = 0, 
+                color = "grey", linewidth = 2, alpha = 0.5) 
+dev.off()
+
+ggplot(data = QuinUseDF, mapping = aes(x = QuinoloneUse, y = Resistance2015, color = MediumCountries, label=MediumCountries))+
+  #geom_point(aes(color = MediumCountries), size = 3, show.legend = FALSE)+
+  scale_color_manual(values = ordered_color)+
+  scale_y_continuous(limits = c(0,50))+
+  scale_x_continuous(limits = c(0,4.5))+
+  theme_bw()+
+  labs(y= "Percentage resistant isolates 2015", x = "Ciprofloxacin Use (DDD / 1000)")
+
+
+png(filename = "Figures/Figure1B_ECDCPlot_Correlation.png", width = 5, height = 6, units = "in", res = 300)
+p+  geom_abline(slope = lm(Resistance2015 ~ QuinoloneUse)$coefficients[2], intercept = lm(Resistance2015 ~ QuinoloneUse)$coefficients[1], 
+            color = "grey", linewidth = 2, alpha = 0.5)  
 dev.off()
 
 cor.test(QuinoloneUse, Resistance2015)
 summary(lm(Resistance2015 ~ QuinoloneUse))
 
+model <- lm(Resistance2015 ~ 0 + QuinoloneUse)
+model2 <- lm(Resistance2015 ~ QuinoloneUse)
+
+anova (model, model2)

@@ -19,6 +19,9 @@ ggplot(data = CiproClusters, aes(x = Year, y = Fraction, fill = Cluster))+
   geom_area(show.legend = FALSE, color = "black")+
   scale_fill_manual(values = mycolors) +
   theme_bw()+
+  labs(y="Percentage resistant isolates", 
+       x = "Year")+
   ggtitle("Turnover of ciprofloxacin resistant strains")
+
 dev.off()
 

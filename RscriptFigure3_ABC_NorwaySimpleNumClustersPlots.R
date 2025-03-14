@@ -1,6 +1,7 @@
 
 setwd("~/Documents/GitHub/CoexistencePaper/")
 library(ggplot2)
+library(tidyverse)
 
 Resistances = c("Ciprofloxacin_SIR" , "Cefotaxim_SIR" , "Gentamicin_SIR", "Ampicillin_SIR", "Piperacillin_tazobactam_SIR")
 ###Start with Cipro
@@ -60,7 +61,7 @@ ggplot(data = OverviewAll, aes(x = DrugResistance, y = NClusters, fill = CLuster
   xlab("")+
   #scale_fill_brewer(palette = "Set1")+
   theme_bw()+
-  scale_fill_discrete(name = "Longevity", labels = paste0(c(16,14:1), " y"))+
+  scale_fill_discrete(name = "Longevity", labels = paste0(c(16:1), " y"))+
   ggtitle("Longevity of resistance strains")+
   theme(legend.position="right")
 dev.off()
@@ -144,7 +145,6 @@ ECDCResistanceAllDrugs<- ECDCResistanceAllDrugs[ECDCResistanceAllDrugs$RegionNam
 ###
 ##############################################
 
-##Aminoglycosides (including Gentamicin)
 png("Figures/Figure_3A_Resistance_Trends_Gladstone.png", width = 5.5, height = 5.5, units = "in", res = 300)
 ggplot(data = NorwaySummary, 
        mapping = aes(x = year, y = Gentamicin_RES))+
@@ -152,7 +152,7 @@ ggplot(data = NorwaySummary,
   scale_y_continuous(limits = c(0,80))+
   scale_x_continuous(limits = c(2000, 2023))+
   theme_bw()+
-  labs(y = "% drug resistance")+
+  labs(y = "Percentage resistant isolates")+
   theme(legend.position = "none")+
   ggtitle("Resistance trends in Norway")+
   geom_line(data = NorwaySummary, aes(x = as.numeric(as.character(year)), y = Ampicillin_RES*100), col = color_hex[1])+
