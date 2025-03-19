@@ -226,8 +226,8 @@ ggList <- lapply(split(Quin_Data_Change, Quin_Data_Change$Category), function(i)
                      xend = Usage, 
                      yend = ResistanceLevel), 
                  arrow = arrow(length = unit(0.1, "inches")), linewidth = 1.7, alpha = 0.9) +
-    labs(x = "Quinolone Usage DDD/year", 
-         y = "Quinolone Resistance Level (%)", 
+    labs(x = "Quinolone Usage DDD/1000", 
+         y = "Percentage quinolone-resistant isolates", 
          title = "Usage and Resistance 2011-2022") +
     xlim(0,4.)+
     ylim(5,45)+
